@@ -108,8 +108,7 @@
 			"columns": [{"text":"Name"},{"text":"Link"},{"text":"Description"}],
 			"rows"   : 
 				  [
-				   [ {"text":"Hyena"},{"text":"[https://www.systemtools.com](https://www.systemtools.com)","md":true},{"text":""}],
-				   [ {"text":"PAGE 387"},{"text":"UDP","md":true},{"text":"netbios-ns"}]
+				   [ {"text":"Hyena"},{"text":"[https://www.systemtools.com](https://www.systemtools.com)","md":true},{"text":""}]
 				  ]
 	},
 	"netbios-ports":

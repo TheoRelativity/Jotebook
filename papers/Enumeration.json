@@ -39,7 +39,7 @@
 						"type": "ref",
 						"link": "nbtstat",
 						"name": "Nbtstat",
-						"href": "enumeration/netbios/tools"
+						"href": "enumeration/netbios/tool"
 					},
 					"tools-list":
 					{
@@ -79,7 +79,7 @@
 	"nbtstat":
 	{
 		"type":"table",
-		"canonicals": ["enumeration/netbios/tools/ntbstat"],
+		"canonicals": ["enumeration/netbios/tool"],
 		"name"   : "Nbtstat",   
 		"title"  : "Nbtstat syntax",
 		"class": "data-value",

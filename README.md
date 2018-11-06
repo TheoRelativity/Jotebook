@@ -49,7 +49,7 @@ Canonicals field contains the url that points to that specific paper.
 You can try to visit http://localhost/Jotebook/?p=hacking%2Fenumeration or http://localhost/Jotebook/?p=enumeration
 and you will be redirected to the index of the Enumeration Paper.
 
-![](Enumeration - Index.jpg)
+![]("Enumeration - Index.jpg")
 
 ## Index - The paper
 

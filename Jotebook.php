@@ -2,6 +2,9 @@
 class Jotebook 
 {
 	protected
+	# ~ Selected Jotebook
+	$CURRENT_JOTEBOOK,
+	
 	# ~ It Contains the decoded  json array of the requested page 
 	$PAPER,
 		
@@ -30,7 +33,7 @@ class Jotebook
 	public $PARSEDOWN;
 	
 	# ~ Jotebook version
-	protected $VERSION = "0.0.2-dev";
+	protected $VERSION = "0.0.3-dev";
 	
 	function __construct($canonical)
 	{
@@ -58,7 +61,7 @@ class Jotebook
 		
 		$this->PAPERS_CANONICAL = $papers_configuration_file['translate'];
 		$this->PAPERS_INDEX_CAN = $papers_configuration_file['index'] ?? [];
-		$this->JOTEBOOK_INDEX   = $papers_configuration_file['jotebook_index'] ?? []; 
+		$this->JOTEBOOK_CAT_INDEX   = $papers_configuration_file['jotebook_cat_index'] ?? []; 
 		
 		
 		# ~ Operations on the canonical string
@@ -109,6 +112,13 @@ class Jotebook
 	    }
 
 	}
+	
+	public function selectJotebook($jotebook_name)
+	{
+		$this->CURRENT_JOTEBOOK = "OHNP";
+		return true;
+	}
+	
 	
 	# ~ Check if the requested paper is valid and set PAPER if
 		# @param string protocols/smtp
@@ -232,13 +242,31 @@ class Jotebook
 	protected function makeIndex()
 	{
 		
-		$index = '<ul>';
-		foreach($this->JOTEBOOK_INDEX as $title => $canonical)
+		if (!file_exists('themes/'.TEMPLATE_NAME.'/index.html'))
 		{
-			$index .= "<li><a href=\"?p=$canonical\">$title</a></li>";
+			$index = '';
+		
+			foreach($this->JOTEBOOK_CAT_INDEX as $cat => $papers)
+			{
+				
+				$index .= "<h1>$cat</h1><ul>";
+				foreach($papers as $title => $canonical)
+				{
+					$index .= "<li><a href=\"?p=$canonical\">$title</a></li>";
+				} 
+				$index .= "</ul>";
+				
+			}
+			
+			file_put_contents('themes/'.TEMPLATE_NAME.'/index.html',$index);
+		
+		}
+		else
+		{
+			$index = file_get_contents('themes/'.TEMPLATE_NAME.'/index.html');
 		}
 		
-		return $index."</ul>";
+		return $index;
 	}
 	
 	protected function wiki_shot($shot_info)
@@ -469,6 +497,7 @@ class Jotebook
 					
 					if (!isset($paper['type']) )
 					{
+						
 						# ~ Set the canonicals for the files
 						if (isset($paper['canonicals']) && is_array($paper['canonicals']))
 						{
@@ -478,10 +507,29 @@ class Jotebook
 								$results['index'][$can_index] = $path;  
 							}
 							
-							# ~ Set the paper into the Jotebook Index
-							if(isset($paper['canonicals'][0]))
+							
+							if(isset($paper['canonicals']) && isset($paper['canonicals'][0]))
 							{
-								$results['jotebook_index'][$paper['info']['title']] = $can_index;
+								$can_index = $paper['canonicals'][0];
+								# ~ Set the paper into the Jotebook Index
+								if (!isset($paper['info']['category']))
+								{
+									if (!isset($results['jotebook_cat_index']) || !isset($results['jotebook_cat_index']['Uncategorized']))
+									{
+										$results['jotebook_cat_index']['Uncategorized'] = [];
+									}
+									
+									$results['jotebook_cat_index']['Uncategorized'] += [$paper['info']['title'] => $can_index];
+								}
+								else
+								{
+									if (!isset($results['jotebook_cat_index']) || !isset($results['jotebook_cat_index'][$paper['info']['category']]))
+									{
+										$results['jotebook_cat_index'][$paper['info']['category']] = [];
+									}
+									
+									$results['jotebook_cat_index'][$paper['info']['category']] += [ $paper['info']['title'] => $can_index];
+								}
 							}
 							
 						}

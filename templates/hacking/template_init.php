@@ -20,30 +20,34 @@ function objToHTML(&$array,&$html='',&$depth=1,$obj_name="")
 	{
 		$html .=  "<p>".str_repeat("&nbsp;-",$depth)."> <a href=\"?p={$array['href']}\">{$array['name']}</a></p>";
 	}
+	else if ($array['type']=="ext-ref")
+	{
+		$html .=  "<p>".str_repeat("&nbsp;-",$depth)."> <a href=\"{$array['href']}\">{$array['name']}</a></p>";
+	}
 	
 	return $html;
 }
 
+# Helper functions for the template
 
-
-/*
- * Print element in json array
- * @param string $data 
- *   example: To read the [title] data $data = 'title'
- *   example: To read a nested value $data = 'tables/table_name/html'
- * @param boolean $HTML
- * if the content contains HTML code use true
- */
-function t($data,$HTML=false)
+# ~ Return paper
+function paper($data)
 {
-	global $OHNP;
-	return $OHNP->t(explode("/",$data),$HTML);
+	global $JB;
+	return $JB->paper(explode("/",$data));
 }
 
-function html($data)
+/* # ~ Return paragraph
+function p($data)
 {
-	global $OHNP;
-	return $OHNP->md(explode("/",$data));
+	global $JB;
+	return $JB->p(explode("/",$data));
+} */
+
+function md($data)
+{
+	global $JB;
+	return $JB->md($data);
 }
 
 
@@ -53,7 +57,7 @@ function html($data)
  * @param array $data
  * example: $data = ['title'=>'This is a title']
 */
-function page($data)
+/* function page($data)
 {
 	
 	foreach($data as $var => $val)
@@ -62,4 +66,30 @@ function page($data)
 	}
     
 	return $template;
+} */
+
+class Template extends Jotebook 
+{
+	
+	function __construct()
+	{
+		
+	}
+	
+	function this_folder($file)
+	{
+		/* 
+			Realpath code here
+			to protect the code 
+		*/
+		return TEMPLATE_DIR.$file;
+	}
+	
+	function index()
+	{
+		return $this->makeIndex();
+	}
+	
 }
+
+$template = new Template();

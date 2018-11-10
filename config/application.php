@@ -6,7 +6,7 @@ define("APP_URL","http://localhost/Jotebook/");
 /*
  * Folder that contains the Jotebook papers.
  */
-define("DATA_DIRECTORY","papers");
+define("DATA_DIRECTORY","papers/OHNP");
 /*
  * Set here the name of the template you chosen.
  */

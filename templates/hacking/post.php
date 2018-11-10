@@ -4,40 +4,35 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
 
-    <title><?= isset($template['title']) ? $template['title'] .' '. TPL_TITLE_SUFFIX : TPL_TITLE ?></title>
+    <title><?= isset($tpl['title']) ? $tpl['title'] .' '. TPL_TITLE_SUFFIX : TPL_TITLE ?></title>
 
     <!-- Bootstrap CSS -->
-    <link rel="stylesheet" href="<?= TEMPLATE_DIR ?>bootstrap.min.css">
+    <link rel="stylesheet" href="<?= $template->this_folder("bootstrap.min.css") ?>">
     <!-- Hacking Theme CSS -->
-    <link rel="stylesheet" href="<?= TEMPLATE_DIR ?>style.css">
+    <link rel="stylesheet" href="<?= $template->this_folder("style.css") ?>">
     <!-- Custom Page Theme CSS -->
-	<?= $template["style"] ?? '' ?>
+	<?= $tpl["style"] ?? '' ?>
 </head>
 <body>
-<div class="wrapper">
-	<div id="content">
-		<form id="shell" autocomplete="off">
-			<div class="autocomplete" >
-				<input id="myInput" type="text" name="p" placeholder="network/protocols">
-			</div>
-		</form>
-		<?= $page_content ?>
-	</div>
+<div id="content">
+	<form id="shell" autocomplete="off">
+		<div class="autocomplete" >
+			<input id="myInput" type="text" name="p" placeholder="network/protocols">
+		</div>
+	</form>
+	<?= $page_content ?>
 </div>
 
-  
-    
-	<!-- jQuery - Slim version (=without AJAX) -->
-    <script src="<?= TEMPLATE_DIR ?>jquery-3.3.1.slim.min.js"></script>
-	
-	<!-- Bootstrap JS -->
-    <script src="<?= TEMPLATE_DIR ?>bootstrap.min.js"></script>
+<!-- jQuery - Slim version (=without AJAX) -->
+<script src="<?= TEMPLATE_DIR ?>jquery-3.3.1.slim.min.js"></script>
 
+<!-- Bootstrap JS -->
+<script src="<?= $template->this_folder("bootstrap.min.js") ?>"></script>
+
+<!-- suggestions file made by the OHNP core -->
+<script src="<?= $template->this_folder("suggestions.js?v=".rand(1,829189239)) ?>"></script>
 	
-	<!-- suggestions file made by the OHNP core -->
-	<script src="<?= TEMPLATE_DIR ?>suggestions.js?v=<?php rand(1,829189239) ?>"></script>
-	
-	<script>
+<script>
 	/* https://www.w3schools.com/howto/howto_js_autocomplete.asp */
 	function autocomplete(inp, arr) {
   /*the autocomplete function takes two arguments,

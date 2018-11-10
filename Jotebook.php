@@ -13,13 +13,24 @@ class Jotebook
 		
 	# ~ Requested for Home?
 	$IS_HOME = false,
+	
+	# ~ Reserved folder names for the notebook folder
+	$RESERVED_FOLDER_NAMES =
+		[
+			"pages" # Reserved folder for wiki-pages
+		],
+	
+	# ~ Contains the index of the Jotebook's papers
+	$JOTEBOOK_INDEX,
 		
 	# ~ Load CSS dinamically from the Template files
+	# for future usage
 	$TEMPLATE_STYLE = '';
 	
 	public $PARSEDOWN;
 	
-	static $version = "0.0.0-dev";
+	# ~ Jotebook version
+	protected $VERSION = "0.0.2-dev";
 	
 	function __construct($canonical)
 	{
@@ -47,15 +58,15 @@ class Jotebook
 		
 		$this->PAPERS_CANONICAL = $papers_configuration_file['translate'];
 		$this->PAPERS_INDEX_CAN = $papers_configuration_file['index'] ?? [];
+		$this->JOTEBOOK_INDEX   = $papers_configuration_file['jotebook_index'] ?? []; 
+		
 		
 		# ~ Operations on the canonical string
 		
 		$canonical = preg_replace('/(^\/|\/$)/','',$canonical);
 		
 
-		
 		# ~ Check for reserved Canonicals
-		
 		if ($canonical == "refresh")
 		{
 			$this->makeContent(__DIR__.DIRECTORY_SEPARATOR.DATA_DIRECTORY);
@@ -168,7 +179,16 @@ class Jotebook
 		}
 		else if ($this->IS_HOME)
 		{
-			include("templates/".TEMPLATE_NAME."/home.php");
+			
+			if (file_exists("templates/".TEMPLATE_NAME."/home.php"))
+			{
+				include("templates/".TEMPLATE_NAME."/home.php");
+			}
+			else
+			{
+				echo $this->makeIndex();
+			}
+	
 		}
 		else 
 		{
@@ -178,7 +198,9 @@ class Jotebook
 			
 			switch($obj_type)
 			{
-				case 'table': echo $this->table($this->PAPER['paragraphs'][$this->PAPER_OBJ]);
+				case 'table': 		echo $this->table($this->PAPER['paragraphs'][$this->PAPER_OBJ]); break;
+				case 'wiki-page': 	echo $this->wiki_page($this->PAPER['paragraphs'][$this->PAPER_OBJ]);break;
+				case 'wiki-shot':   echo $this->wiki_shot($this->PAPER['paragraphs'][$this->PAPER_OBJ]);break;
 			}
 
 		}
@@ -204,10 +226,88 @@ class Jotebook
 		echo $html;
 		
 	}
-
-	protected function table($obj)
+	
+	# ~ Make the index of the Jotebook
+	
+	protected function makeIndex()
 	{
-		$table = "<h2>{$obj['title']}</h2>";
+		
+		$index = '<ul>';
+		foreach($this->JOTEBOOK_INDEX as $title => $canonical)
+		{
+			$index .= "<li><a href=\"?p=$canonical\">$title</a></li>";
+		}
+		
+		return $index."</ul>";
+	}
+	
+	protected function wiki_shot($shot_info)
+	{
+		if (file_exists(DATA_DIRECTORY."/shots/{$shot_info['content']}"))
+		{
+			include DATA_DIRECTORY."/shots/{$shot_info['content']}";
+		}
+		else
+		{
+			return "The wiki-shot file you are looking for is missing.";
+		}
+		
+	}
+	
+	### Features in Papers ###
+	
+	# ~ Wiki-Page
+	
+	/*
+	* 	"wiki-page-id":
+	*	{
+	*		"type":			"wiki-page",
+	*		"canonicals": 	[],
+	*		"title" : 		"",
+	*		"template": 	"template-name",
+	*		"page_name": 	"page_name"
+	*	}
+	*
+	*/
+	protected function wiki_page($page_info)
+	{
+		# ~ Search for its specific model file
+		if (file_exists(DATA_DIRECTORY."/pages/{$page_info['page_name']}"))
+		{
+			include(DATA_DIRECTORY."/pages/{$page_info['page_name']}");	
+		}
+		# ~ Search for its generic model template file
+		else if (file_exists(DATA_DIRECTORY."/pages/{$page_info['template']}.php"))
+		{
+			include(DATA_DIRECTORY."/pages/{$page_info['template']}.php");
+		}
+		else 
+		{
+			return "You missed the template {$page_info['template']} in your notebook.";
+		}
+		
+	}
+	
+	# ~ Table
+	/*
+	*	"table-id":
+	*	{
+	*		"type":			"table",
+	*		"canonicals": 	[],
+	*		"title":   		"Table Title",
+	*		"class": 		"",
+	*		"reference": 	[],
+	*		"columns": [{"text":"Column Name",class="class-name"},{"text":"Column Name 2"}],
+	*		"rows"   : 
+	*				  [
+	*				   [{"text":"Cell Text"},{"text":"(link)(link.com)","md":true}],
+	*				   [{"text":"Cell Text",class=""},{"text":"(link)(link.com)","md":true}]
+	*				  ]
+	*	}
+	*/
+	protected function table($obj,$show_title=true)
+	{
+		$table = $show_title ? "<h2>{$obj['title']}</h2>" : "";
 		$rows  = '';
 			
 		# Table's Header 
@@ -215,10 +315,10 @@ class Jotebook
 		{
 			$class = isset($col['class']) ? "class='{$col['class']}'" : '';
 								  
-				if (isset($col['md']))
-				{
-					$table .= "<th $class>".$this->PARSEDOWN->text($col['text']).'</th>';
-				}
+			if (isset($col['md']))
+			{
+				$table .= "<th $class>".$this->PARSEDOWN->text($col['text']).'</th>';
+			}
 			else
 			{
 				$table .= "<th $class>{$col['text']}</th>"; 
@@ -260,7 +360,45 @@ class Jotebook
 		return $table;
 	}
 	
-	public function t($destination,$HTML)
+	# ~ Paper 
+	/*
+	 * 	Get elements in the paper file
+	 */
+	public function paper($destination)
+	{
+		
+		$data = $this->PAPER;
+		
+		# ~ Set the requested element in $data
+		$data = &$data;
+		foreach($destination as $path)
+		{
+			$data = $data[$path] ?? '';
+		}
+		
+		if (isset($data['type']))
+		{
+			$obj_type = $data['type'];
+		
+			switch($obj_type)
+			{
+				case 'table': 		return $this->table($data); break;
+				case 'wiki-shot':   return $this->wiki_shot($data);break;
+			}
+		}
+		else 
+		{
+			return $data;
+		}
+
+		
+		return "";	
+		
+	}
+	
+/* 	# ~ Return Paragraph
+	
+	public function p($destination)
 	{
 		$data = $this->PAPER['paragraphs'];
 		$data = &$data;
@@ -269,21 +407,21 @@ class Jotebook
 			$data = $data[$path] ?? '';
 		}
 		
-		return $HTML ? $data : (is_array($data) ? $data : htmlspecialchars($data));	
+		$obj_type = $data['type'];
 		
-	}
-	
-	public function md($destination)
-	{
-		
-		$data = $this->PAPER;
-		$data = &$data;
-		foreach($destination as $path)
+		switch($obj_type)
 		{
-			$data = $data[$path] ?? '';
+				case 'table': 		return $this->table($this->PAPER['paragraphs'][$path]); break;
+				# case 'wiki-page': 	return $this->wiki_page($this->PAPER['paragraphs'][$path]);break;
 		}
 		
-		return $this->PARSEDOWN->text($data);
+		return "";	
+		
+	} */
+	
+	public function md($text)
+	{
+		return $this->PARSEDOWN->text($text);
 	}
 	
 	# Exit Function
@@ -293,65 +431,90 @@ class Jotebook
 		exit("404 - Page Not Found");
 	}
 	
-	# ~ Elaborate the DATA_DIRECTORY and makes the papers and suggestions file
 	
+	# ~ Initialatization functions
+	
+	# ~ Elaborate the DATA_DIRECTORY and makes the papers and suggestions file
 	protected function  makeContent($dir, &$results = [])
 	{
+		# ~ Get all files in the current dir
+		
 		$files = scandir($dir);
 
 		foreach($files as $key => $value)
 		{
+			# Check for the realpath
 			$path = realpath($dir.DIRECTORY_SEPARATOR.$value);
 			
 			if(!is_dir($path))
 			{
-				
+				# Check if is a json file
 				if(pathinfo($path, PATHINFO_EXTENSION) == 'json')
 				{
-				
+					
+					# Get the paper's data
+					
 					$paper = json_decode(file_get_contents($path),true);
 					
+					# Validate the paper
 					if ($paper === NULL)
 					{
-						exit("Bad Configuration File: " . $path);
-					}
-					
-					if (isset($paper['canonicals']))
-					{
-						foreach($paper['canonicals'] as $can_index)
-						{
-							$results['index'][$can_index] = $path;  
-						}
+						exit("Bad Paper File: " . $path);
 					}
 					
 					
-					foreach($paper['paragraphs'] as $paragraph_name => $paragraph_info)
+					# ~ Check if the json file is not a page
+					
+					# Paper type for future developments
+					
+					if (!isset($paper['type']) )
 					{
-						if (isset($paragraph_info['canonicals']))
+						# ~ Set the canonicals for the files
+						if (isset($paper['canonicals']) && is_array($paper['canonicals']))
 						{
-							foreach($paragraph_info['canonicals'] as $can_par)
+							# Add canonicals for the page to the index database 
+							foreach($paper['canonicals'] as $can_index)
 							{
-								$results['translate'][$can_par] = ["file"=>$path,"obj"=>$paragraph_name];
+								$results['index'][$can_index] = $path;  
+							}
+							
+							# ~ Set the paper into the Jotebook Index
+							if(isset($paper['canonicals'][0]))
+							{
+								$results['jotebook_index'][$paper['info']['title']] = $can_index;
+							}
+							
+						}
+					
+						# ~ Set the canonicals for the objects in files
+						foreach($paper['paragraphs'] as $paragraph_name => $paragraph_info)
+						{
+							if (isset($paragraph_info['canonicals']))
+							{
+								foreach($paragraph_info['canonicals'] as $can_par)
+								{
+									$results['translate'][$can_par] = ["file"=>$path,"obj"=>$paragraph_name];
+								}
 							}
 						}
 					}
-					
-				 }
+				}
 			}
-			else if($value != "." && $value != ".." && $value != "external")
+			else if($value != "." && $value != ".." && !in_array($value,$this->RESERVED_FOLDER_NAMES))
 			{
 				$this->makeContent($path, $results);
 			}
 		}
-		/*
-		 * Save Suggestions into the Template folder
-		*/
-		
+			
+		# ~ Make Suggestions for template's API
 		$suggestions = array_merge(array_keys($results['translate']),array_keys($results['index']));
 		sort($suggestions);
+		
 		file_put_contents(__DIR__.'/themes/'.TEMPLATE_NAME.'/suggestions.js',"var suggestions = " . json_encode($suggestions) . ";");
 		file_put_contents(__DIR__.DIRECTORY_SEPARATOR.'config/papers.json',json_encode($results));
 	}
+	
+	# ~ Initialize the jotebook content
 	
 	public function init()
 	{

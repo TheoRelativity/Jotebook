@@ -1,0 +1,97 @@
+{
+  # Required
+  "canonicals":[""],
+  
+  # Required
+  "info": 
+  {
+	"title":      "Page Title",
+	"category":   "Category Name"
+  },
+
+  # Optional. Is useful if you want to made a template page
+  
+  "model": "model_name",
+  
+  "model_name": 
+  {
+	# Model Components
+	# Here you can set a series of data values "name": "Here a name"
+  },
+  
+  # Required
+ "index":
+ {
+	
+	# Link to a jotebook's canonical ID
+	"object":
+	{
+		"type": "ref",
+		"name": "Object's Title",
+		"href": "object's canonical id"
+	},
+	
+	# Here you can define a Section
+	"section-name":
+	{
+		"type": "section",
+		"name": "Section Name",
+		"paragraphs":
+		{
+			# Here you can insert others nested section or mixed content
+		}
+	},
+	
+	# Link to a an external URL
+	"external-reference":
+	{
+		"type": "ext-ref",
+		"name": "Page Title",
+		"href": "URL"
+	}
+	
+ },
+ 
+ "paragraphs": 
+  {
+   
+   # Here you can insert your block of HTML/PHP code
+   "wiki-shot-id":
+	{
+		"type": "wiki-shot",
+		"content": "shot_file_name.extension",
+		"canonicals": ["canonical's id"]
+	},
+	
+	# Here you can insert your PHP page
+	"wiki-page-id":
+	{
+		"type":"wiki-page",
+		"canonicals": ["canonical's id"],
+		"title" : "DNS - Domain Name System",
+		"template": "template_name",
+		"page_name": "page_file_name.extension"
+    },
+
+	# Here you can insert your Table
+	"table":
+	{
+		"type":"table",
+		
+		# Special function glossary, Includes this table into a dynamic glossary for the jotebook
+		"glossary": [0,1],
+		
+		"canonicals": ["canonical's id"],
+		"name"   : "table-id",
+		"title"  : "Table's title",
+		"class":   "classes' names",
+		"references": ["reference's links"],
+		"columns":   [{"text":""},{"text":"","class":"class1 class2"},{"text":"","md":true}],
+		"rows"   : 
+				  [
+					[{"text":"","class":"class1 class2"},{"text":""},{"text":"","md":true}]
+				  ]
+	}
+	
+  }
+}

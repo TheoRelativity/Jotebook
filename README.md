@@ -37,6 +37,6 @@ define("DATA_DIRECTORY","somewhere/papers");
 ```
 7. Cut/copy the folder called "jotebook_example" into your "papers" directory.
 8. Open your browser. Visit the page: http://localhost/Jotebook
-9. Ignore errors if they appear. Click on JB Setting and then on update.
+9. Ignore errors if they appear. Click on JB Settings and then on update.
 10. First installation finished. If you see errors controls all the steps again.
 

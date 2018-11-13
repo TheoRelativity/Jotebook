@@ -13,3 +13,17 @@ https://github.com/TheoRelativity/Jotebook/wiki
 * PHP 7 up and running on your host machine
 * Web Browser
 
+### First Installation
+
+1. Download or clone this repo in your computer. 
+2. Copy the Jotebook folder into your web server directory.
+3. Make a new folder where you prefer into your computer. Copy its location.
+4. Open with a text editor the application.php file in Jotebook/config folder
+5. Find the line
+```php
+/*
+  * Folder that contains the Jotebook's folders.
+*/
+define("DATA_DIRECTORY","");
+```
+6. Paste the location between ""

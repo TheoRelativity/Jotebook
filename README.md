@@ -16,9 +16,9 @@ https://github.com/TheoRelativity/Jotebook/wiki
 ### First Installation
 
 1. Download or clone this repo in your computer. 
-2. Copy the Jotebook folder into your web server directory.
+2. Copy the Jotebook Root folder into your web server directory. Rename the directory from Jotebook-master to Jotebook.
 3. Make a new folder where you prefer into your computer. Copy its location.
-   For semplicity, I assume you make a folder in your Desktop called "papers".
+   For semplicity, I assume you made a folder somewhere called "papers".
 4. Open with a text editor the application.php file in Jotebook/config folder
 5. Find the line
 ```php
@@ -27,8 +27,14 @@ https://github.com/TheoRelativity/Jotebook/wiki
 */
 define("DATA_DIRECTORY","");
 ```
-6. Paste the location of the papers directory in your desktop. Remember to add the directory separator at the end. 
-   For linux / and for Windows \\.
+6. Paste the location of the papers directory in your desktop. Remember to **NOT** add the directory separator at the end. 
+   You should see something like this one.
+```php
+/*
+  * Folder that contains the Jotebook's folders.
+*/
+define("DATA_DIRECTORY","somewhere/papers");
+```
 7. Cut/copy the folder called "jotebook_example" into your "papers" directory.
 8. Open your browser. Visit the page: http://localhost/Jotebook
 9. Ignore errors if they appear. Click on JB Setting and then on update.

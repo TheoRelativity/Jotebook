@@ -10,15 +10,11 @@ define("APP_DIRECTORY",__DIR__."/../");
 /*
  * Folder that contains the Jotebook's folders.
  */
-define("DATA_DIRECTORY","papers");
+define("DATA_DIRECTORY","");
 /*
  * Folder that contains cached data
  */
 define("CACHE_DIRECTORY","cache");
-/*
- * Set here the name of the template you chosen.
- */
-/* define("TEMPLATE_NAME","hacking"); */
 /*
  * Set here the name of the template you chosen.
  */

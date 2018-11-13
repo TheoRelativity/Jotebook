@@ -40,7 +40,7 @@ class Jotebook
 	public $PARSEDOWN;
 	
 	# ~ Jotebook version
-	protected $VERSION = "0.0.4-dev";
+	protected $VERSION = "0.0.5-dev";
 	
 /*------------------------/
 	START { Jotebook Core Process

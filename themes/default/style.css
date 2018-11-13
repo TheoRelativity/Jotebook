@@ -1,0 +1,197 @@
+/* ------------------------------------------- 
+   Default Theme
+---------------------------------------------- */
+
+/* Theme Design */
+
+:root {
+	
+  --ht-bck-primary: 20, 19, 19;
+  --ht-col-primary: 255,255,255;
+  --ht-theme: 174,169,203; /* #aea9cb */
+  --ht-color-green: #9acc14;
+}
+
+body {
+	font-family: Calibri,Candara,Segoe,Segoe UI,Optima,Arial,sans-serif; 
+	line-height: 1.2;
+	background-image: url(images/background.jpg);
+	font-size: 20px;
+}
+
+p 
+{
+	margin:0;
+}
+
+/* ---------------------------------------------------
+    CONTENT STYLE
+----------------------------------------------------- */
+
+#content {
+    width: 90%;
+	padding: 20px;
+    min-height: 100vh;
+    transition: all 0.3s;
+	margin: 10px auto;
+	background: #ffffff1a;
+	color: rgb(var(--ht-col-primary));
+}
+
+
+.green_text 
+{
+	color: var(--ht-color-green);
+}
+
+.quote {
+	
+	background: #bdb2b233;
+	color: #fff;
+	padding: 10px;
+	margin-bottom: 10px;
+}
+
+.light-quote {
+	padding: 20px !important;
+	background: #fff;
+	color: #000;
+	padding: 10px;
+	margin-bottom: 10px;
+}
+
+pre 
+{
+	font-family: 'Open Sans', sans-serif;
+	background: #000;
+	color: #fff;
+	padding: 10px;
+	margin: 5px;
+}
+
+pre code 
+{
+	padding:0;
+	margin:0;
+	font-family: 'Open Sans', sans-serif;
+	font-size: 1.7rem;
+}
+
+/* ---------------------------------------------
+	TABLES
+------------------------------------------------ */
+table {
+  margin: 0 auto;
+  width: 100%;
+  border-collapse: collapse;
+  overflow: hidden;
+  box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
+}
+th,
+td {
+  padding: 8px;
+  background-color: rgba(65, 98, 68, 0.62);
+  color: #fff;
+}
+th {
+  text-align: left;
+}
+thead th {
+  background-color: #b8b8ba1a;
+}
+tbody tr:hover {
+  background-color: rgba(255, 255, 255, 0.3);
+}
+tbody td {
+  position: relative;
+}
+tbody td:hover:before {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: -9999px;
+  bottom: -9999px;
+  background-color: rgba(255, 255, 255, 0.2);
+  z-index: -1;
+}
+
+a {
+	color: rgb(var(--ht-theme));
+}
+
+table.data-value td:nth-child(1)
+{
+	background: rgba(var(--ht-bck-primary),0.8);
+	text-align: center;
+	color: rgb(var(--ht-col-primary));
+}
+
+table.data-value td:nth-child(2)
+{
+	background-color: rgba(var(--ht-theme),0.6);
+	text-align: left;
+	color: rgb(var(--ht-col-primary));
+}
+
+table.data-value td:nth-child(2) a 
+{
+	color: rgb(var(--ht-col-primary));
+}
+
+.small-table 
+{
+	width: auto;
+	margin-left: 0;
+	text-align:left;
+}
+
+/* ---------------
+   Autocomplete
+-----------------*/
+
+.autocomplete {
+  /*the container must be positioned relative:*/
+  position: relative;
+  display: inline-block;
+}
+input {
+	width: 500px;
+    line-height: 1.5;
+    color: #fff;
+    background: transparent;
+    border: 1px solid #c9c9c933;
+    border-radius: 3px;
+
+}
+
+
+.autocomplete-items {
+  position: absolute;
+  border-bottom: none;
+  border-top: none;
+  z-index: 99;
+  /*position the autocomplete items to be the same width as the container:*/
+  top: 100%;
+  left: 0;
+  right: 0;
+}
+.autocomplete-items div {
+  padding: 10px;
+  cursor: pointer;
+  background-color: #18304ae6;
+  color: #fff;
+}
+.autocomplete-items div:hover {
+  /*when hovering an item:*/
+  background-color: #38987f;
+}
+.autocomplete-items div strong {
+	font-weight: bold;
+	color: rgb(var(--ht-theme));
+}
+.autocomplete-active {
+  /*when navigating through the items using the arrow keys:*/
+  background-color: #c2c2c299 !important;
+  color: #ffffff;
+}

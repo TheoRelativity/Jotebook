@@ -2,15 +2,24 @@
 class Jotebook 
 {
 	protected
-	# ~ Selected Jotebook
-	$CURRENT_JOTEBOOK,
+	# ~ Selected Jotebook's papers' folder
+	$JOTEBOOK_FOLDER,
+	
+	# ~ Selected Jotebook's cache's folder
+	$JOTEBOOK_CACHE_FOLDER,
+	
+	# ~ Contains the index of the Jotebook's papers
+	$JOTEBOOK_INDEX,
 	
 	# ~ It Contains the decoded  json array of the requested page 
 	$PAPER,
 		
 	# ~ It Contains the requested object 
 	$PAPER_OBJ = '',
-		
+	
+	# ~ Template Name
+	$TEMPLATE_NAME = 'default',
+	
 	# ~ Requested for Index?
 	$IS_PAPER_INDEX = false,
 		
@@ -20,11 +29,9 @@ class Jotebook
 	# ~ Reserved folder names for the notebook folder
 	$RESERVED_FOLDER_NAMES =
 		[
-			"pages" # Reserved folder for wiki-pages
+			"pages", # Reserved folder for wiki-pages
+			"shots"  # Reserved folder for wiki-shot pages
 		],
-	
-	# ~ Contains the index of the Jotebook's papers
-	$JOTEBOOK_INDEX,
 		
 	# ~ Load CSS dinamically from the Template files
 	# for future usage
@@ -33,47 +40,117 @@ class Jotebook
 	public $PARSEDOWN;
 	
 	# ~ Jotebook version
-	protected $VERSION = "0.0.3-dev";
+	protected $VERSION = "0.0.4-dev";
 	
-	function __construct($canonical)
+/*------------------------/
+	START { Jotebook Core Process
+------------------------*/
+
+	# > Step 1:
+	function __construct()
 	{
 		
 		# ~ Jotebook Initial Check
-		
 		if
 		  ( 
-			!defined("DATA_DIRECTORY") || 
-			!file_exists(__DIR__.DIRECTORY_SEPARATOR.'config')  ||
-			!file_exists(__DIR__.DIRECTORY_SEPARATOR.'config/papers.json')  ||
-			json_decode(file_get_contents(__DIR__.DIRECTORY_SEPARATOR.'config/papers.json'),true) === NULL
+			!defined("DATA_DIRECTORY") 
 		  )
 		{
-			$this->makeContent(__DIR__.DIRECTORY_SEPARATOR.DATA_DIRECTORY);
-			exit("Refresh the page. If you already reloaded it check your Jotebook installation.");
+			exit("application config file is missing");
 		}
+		
+	}
+	
+	
+	# > Step 2:	
+	# ~ Start the process
+	public function run($jotebook,$canonical)
+	{
+		# ~ Set the current Jotebook
+		$this->selectJotebook($jotebook);
+		
+		# ~ Init the Jotebook
+		$this->paperInit($canonical);
+		
+		# ~  Init the rendering
+		$this->show();
+	}
 
+	# > Step 3:
+	# ~ Select Jotebook
+	protected function selectJotebook($jotebook_name)
+	{
+		
+		$jotebook_directory = DATA_DIRECTORY."/$jotebook_name";
+		
+		if (file_exists($jotebook_directory) && is_dir($jotebook_directory))
+		{
+			# ~ Set the Jotebook Folder var
+			$this->JOTEBOOK_FOLDER = $jotebook_directory;
+			
+			# ~ Set and init the Jotebook cache folder
+			$this->cache("$jotebook_name");
+			
+		}
+		else
+		{
+			exit("The Jotebook you are looking for has not been found");
+		}
+		
+	}	
+
+	# > Step 4:
+	# ~ Init the cache and set JOTEBOOK_CACHE_FOLDER
+	protected function cache($jotebook_name)
+	{
+		$cache_directory = CACHE_DIRECTORY."/$jotebook_name";
+		
+		# ~ Check if the jotebook cache folder exists
+		if(!file_exists($cache_directory) || !is_dir($cache_directory))
+		{
+			if(!mkdir($cache_directory))
+			{
+				exit("Impossible make the cache directory for the current Jotebook");
+			}
+		}
+		
+		# ~ Set the cache folder
+		
+		$this->JOTEBOOK_CACHE_FOLDER = $cache_directory;
+		
+		if (!file_exists($cache_directory.'/papers.json'))
+		{
+			# ~ Elaborate the Jotebook's content
+			$this->makeContent($this->JOTEBOOK_FOLDER);
+			$this->makeIndex(true);
+		}
+		
+		return $cache_directory;
+	}
+	
+	# > Step 5:	
+	# ~ Init the Paper
+	protected function paperInit($canonical)
+	{
 		
 		# ~ Load The Papers' Configuration file
-		
-		$papers_configuration_file = json_decode(file_get_contents(CONFIG_DIRECTORY.'/papers.json'),true);
+		$papers_configuration_file = json_decode(file_get_contents($this->JOTEBOOK_CACHE_FOLDER.'/papers.json'),true);
 		
 		# ~ Load whitelist canonical in PAPERS_CANONICAL
 		
-		$this->PAPERS_CANONICAL = $papers_configuration_file['translate'];
+		$this->PAPERS_CANONICAL = $papers_configuration_file['translate'] ?? [];
 		$this->PAPERS_INDEX_CAN = $papers_configuration_file['index'] ?? [];
 		$this->JOTEBOOK_CAT_INDEX   = $papers_configuration_file['jotebook_cat_index'] ?? []; 
-		
 		
 		# ~ Operations on the canonical string
 		
 		$canonical = preg_replace('/(^\/|\/$)/','',$canonical);
 		
-
 		# ~ Check for reserved Canonicals
 		if ($canonical == "refresh")
 		{
-			$this->makeContent(__DIR__.DIRECTORY_SEPARATOR.DATA_DIRECTORY);
-			exit("Refreshed!");
+			$this->refresh();
+			exit(header("location: ".APP_URL));
 		}
 		else if ($canonical == "home")
 		{
@@ -105,24 +182,129 @@ class Jotebook
 			}
 			else
 			{
-				exit("The table you are looking for doesn't exist: $canonical");
+				exit("The obj you are looking for doesn't exist: $canonical");
 			}
 		
-		
 	    }
+	}
 
-	}
-	
-	public function selectJotebook($jotebook_name)
+	# > Step 6:		
+	# ~	Load the template files and show the HTML code
+	protected function show()
 	{
-		$this->CURRENT_JOTEBOOK = "OHNP";
-		return true;
+		
+		$template_dir = 'templates/'.$this->TEMPLATE_NAME.'/';
+		
+		# ~ Load the init template file
+		include $template_dir.'template_init.php';
+		
+		ob_start();
+		
+		# ~ Choose the template file to load
+		
+		if ($this->IS_PAPER_INDEX)
+		{
+			include($template_dir."paper_index.php");
+		}
+		else if ($this->IS_HOME)
+		{
+			
+			if (file_exists($template_dir."home.php"))
+			{
+				include($template_dir."home.php");
+			}
+			else
+			{
+				echo $this->makeIndex();
+			}
+	
+		}
+		else 
+		{
+			# ~ Get the object type
+			
+			$obj_type = $this->PAPER['paragraphs'][$this->PAPER_OBJ]["type"];
+			
+			switch($obj_type)
+			{
+				case 'table': 		echo $this->table($this->PAPER['paragraphs'][$this->PAPER_OBJ]); break;
+				case 'wiki-page': 	echo $this->wiki_page($this->PAPER['paragraphs'][$this->PAPER_OBJ]);break;
+				case 'wiki-shot':   echo $this->wiki_shot($this->PAPER['paragraphs'][$this->PAPER_OBJ]);break;
+			}
+
+		}
+		
+		$page_content = ob_get_contents();
+		ob_end_clean();
+		
+		ob_start();
+		
+		# ~ Set custom style for the page if required
+		if ($this->TEMPLATE_STYLE!='')
+		{
+			$template['style'] = $this->TEMPLATE_STYLE;
+		}
+		
+		# ~ Load the Body Container of the page
+		include($template_dir."post.php");	
+
+		
+		$html = ob_get_contents();
+		ob_end_clean();
+		echo $html;
+		
 	}
+/*------------------------/
+	END } Jotebook Core Process
+------------------------*/
+
+/*------------------------/
+    START {  Theme Functions
+------------------------*/
+
+protected function getTheme()
+{
+	return $this->TEMPLATE_NAME;
+}
+public function selectTheme($theme_name)
+{
 	
+	# >> TO ADD: Controls on $theme_name input
 	
-	# ~ Check if the requested paper is valid and set PAPER if
-		# @param string protocols/smtp
-		# @return boolean
+	$template_dir = APP_DIRECTORY."/templates/$theme_name";
+	$theme_dir    = APP_DIRECTORY."/themes/$theme_name";
+	
+	if ( !file_exists($theme_dir)     || 
+		 !file_exists($template_dir)  ||
+	     !is_dir($theme_dir)		  ||
+		 !is_dir($template_dir)		  
+	   )
+	{
+		exit("Invalid Theme's Name");
+	}
+		
+   if ( !file_exists($template_dir.'/template_init.php')     ||
+		!file_exists($template_dir.'/post.php')
+      )
+	  {
+		 exit("Invalid Theme");  
+	  }
+   
+   $this->TEMPLATE_NAME = $theme_name;
+ 
+}
+
+/*------------------------/
+    END } Theme Functions
+------------------------*/
+
+/*------------------------/
+	START { Paper Functions 
+------------------------*/	
+
+	# ~ Check if the requested paper is valid and set PAPER if is it
+	# @param string protocols/smtp
+	# @return boolean
 		
 	protected function paperIsValid($paper_canonical)
 	{
@@ -164,128 +346,15 @@ class Jotebook
 		
 	}
 	
-	# ~ Start the show process
+/*------------------------/
+	END } Paper Functions
+------------------------*/	
 	
-	public function run()
-	{
-		$this->show();
-	}
-	
-	# ~ Load the template files and show the HTML code
-	
-	protected function show()
-	{
-		# ~ Load the init template file
-		
-		include 'templates/'.TEMPLATE_NAME.'/template_init.php';
-		
-		ob_start();
-		
-		# ~ Choose the template file to load
-		
-		if ($this->IS_PAPER_INDEX)
-		{
-			include("templates/".TEMPLATE_NAME."/paper_index.php");
-		}
-		else if ($this->IS_HOME)
-		{
-			
-			if (file_exists("templates/".TEMPLATE_NAME."/home.php"))
-			{
-				include("templates/".TEMPLATE_NAME."/home.php");
-			}
-			else
-			{
-				echo $this->makeIndex();
-			}
-	
-		}
-		else 
-		{
-			# ~ Get the object type
-			
-			$obj_type = $this->PAPER['paragraphs'][$this->PAPER_OBJ]["type"];
-			
-			switch($obj_type)
-			{
-				case 'table': 		echo $this->table($this->PAPER['paragraphs'][$this->PAPER_OBJ]); break;
-				case 'wiki-page': 	echo $this->wiki_page($this->PAPER['paragraphs'][$this->PAPER_OBJ]);break;
-				case 'wiki-shot':   echo $this->wiki_shot($this->PAPER['paragraphs'][$this->PAPER_OBJ]);break;
-			}
-
-		}
-		
-		$page_content = ob_get_contents();
-		ob_end_clean();
-		
-		ob_start();
-		
-		# ~ Set custom style for the page if required
-		if ($this->TEMPLATE_STYLE!='')
-		{
-			$template['style'] = $this->TEMPLATE_STYLE;
-		}
-		
-		# ~ Load the Body Container of the page
-
-		include("templates/".TEMPLATE_NAME."/post.php");	
-
-		
-		$html = ob_get_contents();
-		ob_end_clean();
-		echo $html;
-		
-	}
-	
-	# ~ Make the index of the Jotebook
-	
-	protected function makeIndex()
-	{
-		
-		if (!file_exists('themes/'.TEMPLATE_NAME.'/index.html'))
-		{
-			$index = '';
-		
-			foreach($this->JOTEBOOK_CAT_INDEX as $cat => $papers)
-			{
-				
-				$index .= "<h1>$cat</h1><ul>";
-				foreach($papers as $title => $canonical)
-				{
-					$index .= "<li><a href=\"?p=$canonical\">$title</a></li>";
-				} 
-				$index .= "</ul>";
-				
-			}
-			
-			file_put_contents('themes/'.TEMPLATE_NAME.'/index.html',$index);
-		
-		}
-		else
-		{
-			$index = file_get_contents('themes/'.TEMPLATE_NAME.'/index.html');
-		}
-		
-		return $index;
-	}
-	
-	protected function wiki_shot($shot_info)
-	{
-		if (file_exists(DATA_DIRECTORY."/shots/{$shot_info['content']}"))
-		{
-			include DATA_DIRECTORY."/shots/{$shot_info['content']}";
-		}
-		else
-		{
-			return "The wiki-shot file you are looking for is missing.";
-		}
-		
-	}
-	
-	### Features in Papers ###
+/*------------------------/
+	START { Papers Features 
+------------------------*/	
 	
 	# ~ Wiki-Page
-	
 	/*
 	* 	"wiki-page-id":
 	*	{
@@ -299,19 +368,37 @@ class Jotebook
 	*/
 	protected function wiki_page($page_info)
 	{
+		$pages_directory = $this->JOTEBOOK_FOLDER.'/pages/';
+		
 		# ~ Search for its specific model file
-		if (file_exists(DATA_DIRECTORY."/pages/{$page_info['page_name']}"))
+		if (file_exists($pages_directory.$page_info['page_name']))
 		{
-			include(DATA_DIRECTORY."/pages/{$page_info['page_name']}");	
+			include($pages_directory.$page_info['page_name']);	
 		}
 		# ~ Search for its generic model template file
-		else if (file_exists(DATA_DIRECTORY."/pages/{$page_info['template']}.php"))
+		else if (file_exists($pages_directory.$page_info['template'].'.php'))
 		{
-			include(DATA_DIRECTORY."/pages/{$page_info['template']}.php");
+			include($pages_directory.$page_info['template'].'.php');
 		}
 		else 
 		{
 			return "You missed the template {$page_info['template']} in your notebook.";
+		}
+		
+	}
+	
+	
+	protected function wiki_shot($shot_info)
+	{
+		$wiki_shot_folder = $this->JOTEBOOK_FOLDER."/shots/";
+		
+		if (file_exists($wiki_shot_folder.$shot_info['content']))
+		{
+			include $wiki_shot_folder.$shot_info['content'];
+		}
+		else
+		{
+			return "The wiki-shot file you are looking for is missing.";
 		}
 		
 	}
@@ -388,6 +475,14 @@ class Jotebook
 		return $table;
 	}
 	
+/*------------------------/
+	END } Papers Features 
+------------------------*/	
+
+/*------------------------/
+	START { Template Helpers Functions 
+------------------------*/	
+	
 	# ~ Paper 
 	/*
 	 * 	Get elements in the paper file
@@ -424,41 +519,56 @@ class Jotebook
 		
 	}
 	
-/* 	# ~ Return Paragraph
-	
-	public function p($destination)
-	{
-		$data = $this->PAPER['paragraphs'];
-		$data = &$data;
-		foreach($destination as $path)
-		{
-			$data = $data[$path] ?? '';
-		}
-		
-		$obj_type = $data['type'];
-		
-		switch($obj_type)
-		{
-				case 'table': 		return $this->table($this->PAPER['paragraphs'][$path]); break;
-				# case 'wiki-page': 	return $this->wiki_page($this->PAPER['paragraphs'][$path]);break;
-		}
-		
-		return "";	
-		
-	} */
-	
 	public function md($text)
 	{
 		return $this->PARSEDOWN->text($text);
 	}
+
+/*------------------------/
+	END } Template Herlpers Functions 
+------------------------*/	
 	
-	# Exit Function
+/*------------------------/
+	START { Content Functions 
+------------------------*/	
 	
-	protected function page404()
+	# ~ Refresh the Jotebook cached content
+	protected function refresh()
 	{
-		exit("404 - Page Not Found");
+		$this->makeContent($this->JOTEBOOK_FOLDER);
+		$this->makeIndex(true);
 	}
 	
+	# ~ Make the index of the Jotebook
+	protected function makeIndex($refresh=false)
+	{
+		
+		if (!file_exists('themes/'.$this->TEMPLATE_NAME.'/index.html') || $refresh)
+		{
+			$index = '';
+		
+			foreach($this->JOTEBOOK_CAT_INDEX as $cat => $papers)
+			{
+				
+				$index .= "<h1>$cat</h1><ul>";
+				foreach($papers as $title => $canonical)
+				{
+					$index .= "<li><a href=\"?p=$canonical\">$title</a></li>";
+				} 
+				$index .= "</ul>";
+				
+			}
+			
+			file_put_contents('themes/'.$this->TEMPLATE_NAME.'/index.html',$index);
+		
+		}
+		else
+		{
+			$index = file_get_contents('themes/'.$this->TEMPLATE_NAME.'/index.html');
+		}
+		
+		return $index;
+	}
 	
 	# ~ Initialatization functions
 	
@@ -557,16 +667,13 @@ class Jotebook
 		# ~ Make Suggestions for template's API
 		$suggestions = array_merge(array_keys($results['translate']),array_keys($results['index']));
 		sort($suggestions);
+		file_put_contents('themes/'.$this->TEMPLATE_NAME.'/suggestions.js',"var suggestions = " . json_encode($suggestions) . ";");
 		
-		file_put_contents(__DIR__.'/themes/'.TEMPLATE_NAME.'/suggestions.js',"var suggestions = " . json_encode($suggestions) . ";");
-		file_put_contents(__DIR__.DIRECTORY_SEPARATOR.'config/papers.json',json_encode($results));
+		file_put_contents($this->JOTEBOOK_CACHE_FOLDER.'/papers.json',json_encode($results));
 	}
 	
-	# ~ Initialize the jotebook content
-	
-	public function init()
-	{
-		$this->getDirContents(__DIR__.DIRECTORY_SEPARATOR.DATA_DIRECTORY);
-	}
+/*------------------------/
+	END } Content Functions 
+------------------------*/	
 	
 }

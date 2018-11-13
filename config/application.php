@@ -1,20 +1,28 @@
 <?php
 /*
- * App Location
+ * App URL
  */
 define("APP_URL","http://localhost/Jotebook/");
 /*
- * Folder that contains the Jotebook papers.
+ * The Jotebook's root folder 
+*/
+define("APP_DIRECTORY",__DIR__."/../");
+/*
+ * Folder that contains the Jotebook's folders.
  */
-define("DATA_DIRECTORY","papers/OHNP");
+define("DATA_DIRECTORY","papers");
+/*
+ * Folder that contains cached data
+ */
+define("CACHE_DIRECTORY","cache");
 /*
  * Set here the name of the template you chosen.
  */
-define("TEMPLATE_NAME","hacking");
+/* define("TEMPLATE_NAME","hacking"); */
 /*
  * Set here the name of the template you chosen.
  */
-define("TEMPLATE_DIR",APP_URL."themes/".TEMPLATE_NAME.'/');
+define("TEMPLATES_DIR",APP_URL."themes/"); 
 /* 
  * Configuration Directory
 */

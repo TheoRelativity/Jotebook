@@ -1,38 +1,64 @@
-<html>
-<head>
+<!DOCTYPE html>
+<html lang="en">
+  <head>
     <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <!-- The above 3 meta tags *must* come first in the head; any other head content must come *after* these tags -->
+    <meta name="description" content="">
+    <meta name="author" content="">
+	<title><?= isset($tpl['title']) ? $tpl['title'] .' '. TPL_TITLE_SUFFIX : TPL_TITLE ?></title>
 
-    <title><?= isset($tpl['title']) ? $tpl['title'] .' '. TPL_TITLE_SUFFIX : TPL_TITLE ?></title>
-
-    <!-- Bootstrap CSS -->
-    <link rel="stylesheet" href="<?= $template->this_folder("bootstrap.min.css") ?>">
-    <!-- Hacking Theme CSS -->
-    <link rel="stylesheet" href="<?= $template->this_folder("style.css") ?>">
-    <!-- Custom Page Theme CSS -->
-	<?= $tpl["style"] ?? '' ?>
+    <!-- Bootstrap core CSS -->
+    <link href="<?= $template->this_folder("css/bootstrap.min.css") ?>" rel="stylesheet">
+	
+	<!-- Default Jotebook's Theme CSS -->
+	<link rel="stylesheet" href="<?= $template->this_folder("style.css") ?>">
+    
 </head>
-<body>
-<div id="content">
+
+  <body>
+
+    <!-- Static navbar -->
+    <nav class="navbar navbar-default">
+      <div class="container">
+        <div class="navbar-header">
+          <a class="navbar-brand" href="#">Jotebook's Name</a>
+        </div>
+        <div id="navbar" class="navbar-collapse collapse">
+          <ul class="nav navbar-nav">
+            <li class="active"><a href="?p">Home</a></li>
+          </ul>
+          <ul class="nav navbar-nav navbar-right">
+			<li class="dropdown">
+              <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">JB Settings <span class="caret"></span></a>
+              <ul class="dropdown-menu">
+                <li><a href="?p=refresh">Update</a></li>
+              </ul>
+            </li>
+          </ul>
+        </div><!--/.nav-collapse -->
+      </div>
+    </nav>
+
+
+<div id="content" class="container">
+
 	<form id="shell" autocomplete="off">
 		<div class="autocomplete" >
-			<input id="myInput" type="text" name="p" placeholder="network/protocols">
+			<input id="myInput" type="text" name="p" placeholder="guide/hello-world">
 		</div>
 	</form>
 	<?= $page_content ?>
-</div>
-
-<!-- jQuery - Slim version (=without AJAX) -->
-<script src="<?= $template->this_folder("jquery-3.3.1.slim.min.js") ?>"></script>
-
-<!-- Bootstrap JS -->
-<script src="<?= $template->this_folder("bootstrap.min.js") ?>"></script>
-
-<!-- suggestions file made by the OHNP core -->
-<script src="<?= $template->this_folder("suggestions.js?v=".rand(1,829189239)) ?>"></script>
 	
-<script>
+</div>
+		
+    <script src="<?= $template->this_folder("jquery-3.3.1.slim.min.js") ?>"></script>
+    <script src="<?= $template->this_folder("js/bootstrap.min.js") ?>"></script>
+	
+	<!-- suggestions file made by Jotebook's core -->
+	<script src="<?= $template->this_folder("suggestions.js?v=".rand(1,829189239)) ?>"></script>
+	<script>
 	/* https://www.w3schools.com/howto/howto_js_autocomplete.asp */
 	function autocomplete(inp, arr) {
   /*the autocomplete function takes two arguments,
@@ -156,5 +182,5 @@ document.addEventListener("click", function (e) {
 
 autocomplete(document.getElementById("myInput"), suggestions);
 	</script>
-</body>
+  </body>
 </html>

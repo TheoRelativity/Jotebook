@@ -1,8 +1,8 @@
 <?php
 # ~ Define the default title page
-define("TPL_TITLE","Hacking Notebook");
+define("TPL_TITLE","Default Jotebook Template");
 # ~ Define the default title page's suffix
-define("TPL_TITLE_SUFFIX",":: Hacking Notebook");
+define("TPL_TITLE_SUFFIX","- Jotebook");
 
 # ~ Elaborates the index of the Paper
 function objToHTML(&$array,&$html='',&$depth=1,$obj_name="")
@@ -10,7 +10,7 @@ function objToHTML(&$array,&$html='',&$depth=1,$obj_name="")
 
 	if($array['type']=="section")
 	{
-	$html .= "<h{$depth}>".str_repeat("-",$depth)."{$array['name']}</h{$depth}>";
+	$html .= "<h{$depth}>".str_repeat("",$depth)."{$array['name']}</h{$depth}>";
 		$depth++;
 		foreach($array["paragraphs"] as $obj => $info)
 			$html = objToHTML($info,$html,$depth,$obj_name);
@@ -18,11 +18,11 @@ function objToHTML(&$array,&$html='',&$depth=1,$obj_name="")
 	}
 	else if ($array['type']=="ref")
 	{
-		$html .=  "<p>".str_repeat("&nbsp;-",$depth)."> <a href=\"?p={$array['href']}\">{$array['name']}</a></p>";
+		$html .=  "<p>".str_repeat("&nbsp;",$depth)." <a href=\"?p={$array['href']}\">{$array['name']}</a></p>";
 	}
 	else if ($array['type']=="ext-ref")
 	{
-		$html .=  "<p>".str_repeat("&nbsp;-",$depth)."> <a href=\"{$array['href']}\">{$array['name']}</a></p>";
+		$html .=  "<p>".str_repeat("&nbsp;",$depth)." <a href=\"{$array['href']}\">{$array['name']}</a></p>";
 	}
 	
 	return $html;
@@ -73,7 +73,7 @@ class Template extends Jotebook
 	
 	function __construct()
 	{
-		$this->selectTheme("hacking");
+		$this->selectTheme("default");
 	}
 	
 	function this_folder($file)

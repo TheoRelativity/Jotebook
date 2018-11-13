@@ -13,4 +13,5 @@ $JB->PARSEDOWN = new Parsedown();
 # ~ Select Theme
 $JB->selectTheme("default");
 
-$JB->run("OHNP",$canonical);
+# ~ Select Jotebook to read
+$JB->run("jotebook_example",$canonical);

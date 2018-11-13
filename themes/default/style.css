@@ -16,7 +16,7 @@ body {
 	font-family: Calibri,Candara,Segoe,Segoe UI,Optima,Arial,sans-serif; 
 	line-height: 1.2;
 	background-image: url(images/background.jpg);
-	font-size: 20px;
+	font-size: 16px;
 }
 
 p 
@@ -62,18 +62,17 @@ p
 
 pre 
 {
-	font-family: 'Open Sans', sans-serif;
-	background: #000;
-	color: #fff;
-	padding: 10px;
-	margin: 5px;
+    background: #000c;
+    color: #fff;
+    padding: 10px;
+    margin: 5px;
+    border: 1px solid #38987f;
 }
 
 pre code 
 {
 	padding:0;
 	margin:0;
-	font-family: 'Open Sans', sans-serif;
 	font-size: 1.7rem;
 }
 

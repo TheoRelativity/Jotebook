@@ -1,7 +1,9 @@
 <?php
 class Jotebook 
 {
-	protected
+	
+	protected 
+	
 	# ~ Selected Jotebook's papers' folder
 	$JOTEBOOK_FOLDER,
 	
@@ -33,14 +35,14 @@ class Jotebook
 	public $PARSEDOWN;
 	
 	# ~ Jotebook version
-	protected $VERSION = "0.0.6-dev";
+	protected $VERSION = "0.0.7-dev";
 	
 /*------------------------/
 	START { Jotebook Core Process
 ------------------------*/
 
 	# > Step 1:
-	function __construct()
+	function __construct($jotebook,$canonical)
 	{
 		
 		# ~ Jotebook Initial Check
@@ -52,18 +54,18 @@ class Jotebook
 			exit("application config file is missing");
 		}
 		
-	}
-	
-	
-	# > Step 2:	
-	# ~ Start the process
-	public function run($jotebook,$canonical)
-	{
 		# ~ Set the current Jotebook
 		$this->selectJotebook($jotebook);
 		
 		# ~ Init the Jotebook
 		$this->paperInit($canonical);
+	}
+	
+	
+	# > Step 2:	
+	# ~ Start the process
+	public function run()
+	{
 		
 		# ~  Init the rendering
 		$this->show();
@@ -185,6 +187,7 @@ class Jotebook
 	# ~	Load the template files and show the HTML code
 	protected function show()
 	{
+		
 		
 		$template_dir = 'templates/'.$this->TEMPLATE_NAME.'/';
 		
@@ -528,6 +531,8 @@ public function selectTheme($theme_name)
 	{
 		return $this->PARSEDOWN->text($text);
 	}
+	
+	
 
 /*------------------------/
 	END } Template Herlpers Functions 

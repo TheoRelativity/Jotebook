@@ -27,11 +27,12 @@
         </div>
         <div id="navbar" class="navbar-collapse collapse">
           <ul class="nav navbar-nav">
-            <li class="active"><a href="?p">Home</a></li>
+            <li><a href="?p">Home</a></li>
           </ul>
           <ul class="nav navbar-nav navbar-right">
-			<li class="dropdown">
-              <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">JB Settings <span class="caret"></span></a>
+			<?= $template->paperIndex() ?>
+            <li class="dropdown">
+              <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">Settings <span class="caret"></span></a>
               <ul class="dropdown-menu">
                 <li><a href="?p=refresh">Update</a></li>
               </ul>
@@ -50,12 +51,35 @@
 		</div>
 	</form>
 	<?= $page_content ?>
-	
+	<div id="ouicards"></div>
 </div>
 		
     <script src="<?= $template->this_folder("jquery-3.3.1.slim.min.js") ?>"></script>
     <script src="<?= $template->this_folder("js/bootstrap.min.js") ?>"></script>
 	
+
+	
+	<script>
+		var flashcards = [];
+		var i = 1;
+		// Get questions
+		$('table td:nth-child(2)').each(function(i) {
+			flashcards.push({question:  $(this).text()});
+		});
+		i = 1;
+		$('table td:nth-child(3)').each(function(i) {
+			flashcards[i].question =  flashcards[i].question + " "  +$(this).text();
+			i++;
+		});
+		i = 1;
+		$('table td:nth-child(1)').each(function(i) {
+			flashcards[i].answer =  $(this).text();
+			i++;
+		});
+
+ 
+
+	</script>
 	<!-- suggestions file made by Jotebook's core -->
 	<script src="<?= $template->this_folder("suggestions.js?v=".rand(1,829189239)) ?>"></script>
 	<script>

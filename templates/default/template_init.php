@@ -37,13 +37,6 @@ function paper($data)
 	return $JB->paper(explode("/",$data));
 }
 
-/* # ~ Return paragraph
-function p($data)
-{
-	global $JB;
-	return $JB->p(explode("/",$data));
-} */
-
 function md($data)
 {
 	global $JB;
@@ -51,29 +44,11 @@ function md($data)
 }
 
 
-/*
- * Set the configuration variable for the 
- * upper page of the template
- * @param array $data
- * example: $data = ['title'=>'This is a title']
-*/
-/* function page($data)
+class Template extends Jotebook
 {
-	
-	foreach($data as $var => $val)
+	function __construct($jotebook,$canonical)
 	{
-		$template[$var] = $val;
-	}
-    
-	return $template;
-} */
-
-class Template extends Jotebook 
-{
-	
-	function __construct()
-	{
-		$this->selectTheme("default");
+		parent::__construct($jotebook,$canonical);
 	}
 	
 	function this_folder($file)
@@ -90,6 +65,26 @@ class Template extends Jotebook
 		return $this->makeIndex();
 	}
 	
+	
+	function paperIndex()
+	{
+		if (!isset($this->PAPER['paragraphs']) || !is_array($this->PAPER['paragraphs']) )
+		{
+			return "";
+		}
+		
+		$paragraphs = "<li class=\"dropdown\">".
+					  "<a href=\"#\" class=\"dropdown-toggle\" data-toggle=\"dropdown\" role=\"button\" aria-haspopup=\"true\" aria-expanded=\"false\">{$this->PAPER['info']['title']}<span class=\"caret\"></span></a>".
+					  "<ul class=\"dropdown-menu\">".
+					  "<li><a href=\"?p={$this->PAPER['canonicals'][0]}\">Index</a></li>";
+			  
+		foreach($this->PAPER['paragraphs'] as $obj => $info)
+		{
+			$paragraphs .= "<li><a href=\"?p={$info['canonicals'][0]}\">{$info['title']}</a></li>";
+		}
+		echo $paragraphs. "</ul></li>";
+	}
+	
 }
 
-$template = new Template();
+$template = new Template(SELECTED_JOTEBOOK,CURRENT_CANONICAL);

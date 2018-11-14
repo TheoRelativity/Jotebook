@@ -4,6 +4,24 @@ This application is useful if you need to have a dynamic notebook to be able to 
 
 > This is a small app I developed for personal use. I started to use it everyday so I tought to share it. This is a work in progress and not a stable version. I am adding features while I am using it and my needs growing up. 
 
+### Features 
+
+> Version 0.0.6-dev
+ 1. Dynamic Tables
+ 2. MarkedDown Full support
+ 3. Dynamic Index
+ 4. Custom Themes
+ 
+> Coming Soon
+ 1. Dynamic Glossary
+ 2. Plugins Support
+   .a Dynamic Flashcards from tables
+   .b DataTables
+
+> In queue
+  - Multi Jotebook switch 
+  - Jotebook GUI editor
+  
 ## Wiki
 
 https://github.com/TheoRelativity/Jotebook/wiki

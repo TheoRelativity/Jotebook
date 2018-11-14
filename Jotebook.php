@@ -26,13 +26,6 @@ class Jotebook
 	# ~ Requested for Home?
 	$IS_HOME = false,
 	
-	# ~ Reserved folder names for the notebook folder
-	$RESERVED_FOLDER_NAMES =
-		[
-			"pages", # Reserved folder for wiki-pages
-			"shots"  # Reserved folder for wiki-shot pages
-		],
-		
 	# ~ Load CSS dinamically from the Template files
 	# for future usage
 	$TEMPLATE_STYLE = '';
@@ -40,7 +33,7 @@ class Jotebook
 	public $PARSEDOWN;
 	
 	# ~ Jotebook version
-	protected $VERSION = "0.0.5-dev";
+	protected $VERSION = "0.0.6-dev";
 	
 /*------------------------/
 	START { Jotebook Core Process
@@ -368,7 +361,8 @@ public function selectTheme($theme_name)
 	*/
 	protected function wiki_page($page_info)
 	{
-		$pages_directory = $this->JOTEBOOK_FOLDER.'/pages/';
+		
+		$pages_directory = $this->JOTEBOOK_FOLDER.'/reserved/pages/';
 		
 		# ~ Search for its specific model file
 		if (file_exists($pages_directory.$page_info['page_name']))
@@ -382,7 +376,7 @@ public function selectTheme($theme_name)
 		}
 		else 
 		{
-			return "You missed the template {$page_info['template']} in your notebook.";
+			return "You missed the template {$pages_directory}{$page_info['page_name']} in your notebook.";
 		}
 		
 	}
@@ -390,7 +384,7 @@ public function selectTheme($theme_name)
 	
 	protected function wiki_shot($shot_info)
 	{
-		$wiki_shot_folder = $this->JOTEBOOK_FOLDER."/shots/";
+		$wiki_shot_folder = $this->JOTEBOOK_FOLDER."/reserved/shots/";
 		
 		if (file_exists($wiki_shot_folder.$shot_info['content']))
 		{
@@ -423,6 +417,17 @@ public function selectTheme($theme_name)
 	protected function table($obj,$show_title=true)
 	{
 		$table = $show_title ? "<h2>{$obj['title']}</h2>" : "";
+		
+		# ~ Reference
+		if (isset($obj['reference']))
+		{
+			if (!is_array($obj['reference']))
+			{
+				$table .= "<span>Reference: </span> <a href=\"{$obj['reference']}\">{$obj['reference']}</a>";
+			}
+		}
+		
+		
 		$rows  = '';
 			
 		# Table's Header 
@@ -658,9 +663,13 @@ public function selectTheme($theme_name)
 					}
 				}
 			}
-			else if($value != "." && $value != ".." && !in_array($value,$this->RESERVED_FOLDER_NAMES))
+			else if($value != "." && $value != "..")
 			{
-				$this->makeContent($path, $results);
+				if ($path != DATA_DIRECTORY.DIRECTORY_SEPARATOR.'reserved')
+				{
+					$this->makeContent($path, $results);
+				}
+				
 			}
 		}
 			

@@ -1,0 +1,32 @@
+{
+  "canonicals":["howto"],
+  "info": 
+  {
+	"title":      "Jotebook's How To - The Guide",
+	"category":   "The Project",
+	"author":     "marioandrea.petruccelli@gmail.com"
+  },
+ 
+ "index":
+ {
+    "wiki":
+	{
+		"type": "ref",
+		"link": "hello-world",
+		"name": "Hello World",
+		"href": "howto/hello world"
+	}
+ },
+ 
+ "paragraphs": 
+  {
+    "wiki-page":
+	{
+		"type":"wiki-page",
+		"canonicals": ["howto/hello world"],
+		"title" : "Hello World",
+		"template": "howto",
+		"page_name": "hello_world.php"
+    }
+  }
+}

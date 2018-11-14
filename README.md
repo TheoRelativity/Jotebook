@@ -11,6 +11,8 @@ This application is useful if you need to have a dynamic notebook to be able to 
  2. MarkedDown Full support
  3. Dynamic Index
  4. Custom Themes
+ 5. Dynamic Pages
+ 6. Quick reference trhough search bar
  
 > Coming Soon
  1. Dynamic Glossary

@@ -5,7 +5,7 @@ require "Jotebook.php";
 
 $canonical = (isset($_GET['p']) && $_GET['p']!="") ? $_GET['p'] : 'home';
 
-define("SELECTED_JOTEBOOK","OHNP");
+define("SELECTED_JOTEBOOK","jotebook_example");
 define("SELECTED_THEME","default");
 define("CURRENT_CANONICAL",$canonical);
 

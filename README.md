@@ -2,7 +2,7 @@
 
 This application is useful if you need to have a dynamic notebook to be able to write pages composed by notes that can be then browsed singularly for quick reference.
 
-> This is a small app I developed for personal use. I started to use it everyday so I tought to share it. This is a work in progress and not a stable version. I am adding features while I am using it and my needs growing up. 
+> This is an application I developed for personal use. I started to use it everyday so I tought to share it. This is a work in progress and not a stable version. I am adding features while I am using it and my needs growing up. **The code is very ugly.** I mean, it has been wrote in the optic to be immediately usable by me and to be wrote again in a second time. So, don't judge my ability to write code by this project.
 
 ### Features 
 
